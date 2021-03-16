@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Update account {{ current_user.first_name }} {% endblock %}
+{% from '_error_messages.html' import field_error_messages, error_messages %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7 offset-lg-2 my-5">
+    <h1>Update account - <a href="{{ url_for('account.show', username=user.username) }}">{{ user.username }}</a></h1><hr>
+    <form method="POST" action="{{ url_for('account.edit', username=user.username) }}">
+      {{ form.csrf_token }}
+      {{ error_messages(form.errors) }}
+
+      <div class="form-group">
+        {{ form.username.label }}
+        {{ form.username(class="form-control") }}
+        {{ field_error_messages(form.username) }}
+      </div>
+      <div class="form-group">
+        {{ form.first_name.label }}
+        {{ form.first_name(class="form-control") }}
+        {{ field_error_messages(form.first_name) }}
+      </div>
+      <div class="form-group">
+        {{ form.last_name.label }}
+        {{ form.last_name(class="form-control") }}
+        {{ field_error_messages(form.last_name) }}
+      </div>
+      <div class="form-group">
+        {{ form.email.label }}
+        {{ form.email(class="form-control") }}
+        {{ field_error_messages(form.email) }}
+      </div>
+      <div class="form-group">
+        {{ form.phone.label }}
+        {{ form.phone(class="form-control") }}
+        {{ field_error_messages(form.phone) }}
+      </div>
+      <div class="form-group">
+        {{ form.dob.label }}
+        {{ form.dob(class="form-control") }}
+        {{ field_error_messages(form.dob) }}
+      </div>
+      <div class="form-group">
+        {{ form.password.label }}
+        {{ form.password(class="form-control") }}
+        {{ field_error_messages(form.password) }}
+      </div>
+      <div class="form-group">
+        {{ form.location.label }}
+        {{ form.location(class="form-control") }}
+        {{ field_error_messages(form.location) }}
+      </div>
+      <hr>
+      <div class="form-group">
+        {{ form.submit(class="btn btn-primary form-control") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

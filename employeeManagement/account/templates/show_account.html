@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.first_name }} {% endblock %}
+{% if current_user == user %}
+{% set active_page = 'account' %}
+{% endif %}
+
+{% block content %}
+<div class="row">
+
+  <div class="col-lg-10">
+    <div class="card mt-4">
+      <div class="card-body">
+        <h3 class="card-title">
+        {{ user.first_name }}
+            {% if user.last_name %}
+            {{ user.last_name }}
+            {% endif %}
+        <small>
+      		{% if user.is_role(Role.EMPLOYEE) %}
+      		(Employee)
+         	{% endif %}
+            {% if user.is_role(Role.ADMIN) %}
+            (Admin)
+            {% endif %}
+      	</small>
+        {% if user == current_user or current_user.is_admin() %}
+          <div class="button-actions">
+      	    <a href="{{ url_for('account.edit', username=user.username) }}" class="btn btn-primary">Update account</a>
+            {% if not current_user.is_admin() %}
+            <form class="delete-form" method="POST" action="{{ url_for('account.delete') }}">
+              <input class="btn btn-danger" type="submit" name="deleteAccount"
+              value="Delete account"
+              onclick="return confirm('Are you sure that you want to permanently delete your account?')">
+      	    </form>
+            {% endif %}
+            {% if current_user.is_admin() %}
+            <form class="delete-form" method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
+              <input class="btn btn-danger" type="submit" name="submit"
+              value="Delete user"
+              onclick="return confirm('Are you sure that you want to permanently delete this user?')">
+      	    </form>
+            {% endif %}
+      		</div>
+
+        {% endif %}
+  	    </h3>
+          <p><b>First Name:</b> {{ user.first_name }}</p>
+          {% if user.last_name %}
+          <p><b>Last Name:</b> {{ user.last_name }}</p>
+          {% endif %}
+          <p><b>Email:</b> {{ user.email }}</p>
+          <p><b>Phone:</b> {{ user.phone }}</p>
+          <p><b>Date of birth:</b> {{ user.dob }}</p>
+        <p><b>Location:</b> {{ user.location }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

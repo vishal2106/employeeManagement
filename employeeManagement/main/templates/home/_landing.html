@@ -1,0 +1,21 @@
+<main role="main">
+    <div class="container">
+      <h1 class="display-3 landing-text">Welcome to Employee Management</h1>
+    </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 offset-md-1">
+        <br>
+        <h2>New employee?</h2>
+        <p><a class="btn btn-primary" href="{{ url_for('auth.register') }}" role="button">Join now »</a></p>
+      </div>
+      <div class="col-md-5 offset-md-2">
+        <br>
+        <h2>Existing employee?</h2>
+        <p><a class="btn btn-primary" href="{{ url_for('auth.login') }}" role="button">Login now »</a></p>
+      </div>
+    </div>
+    <hr>
+  </div>
+</main>

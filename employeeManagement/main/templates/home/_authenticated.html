@@ -1,0 +1,167 @@
+{% if current_user.is_role(Role.EMPLOYEE) %}
+<div class="row">
+  <div class="col-lg-10">
+      <div class="card card-outline-secondary my-4">
+        <div class="card-header">
+          Welcome, {{ current_user.username }}
+        </div>
+        <div class="card-body">
+          <h4>
+            Username:
+            <a href="{{ url_for('account.show', username=current_user.username) }}">{{ current_user.username }}</a>
+          </h4>
+          <h4>
+            Name:
+            <small>{{ current_user.first_name }}</small>
+            {% if current_user.last_name %}
+            <small>{{ current_user.last_name }}</small>
+            {% endif %}
+          </h4>
+          <h4>
+            Email:
+            <small>{{ current_user.email }}</small>
+          </h4>
+          <h4>
+            Phone:
+            <small>{{ current_user.phone }}</small>
+          </h4>
+          <h4>
+            Date of birth:
+            <small>{{ current_user.dob }}</small>
+          </h4>
+          <h4>
+            Location:
+          <small>{{ current_user.location }}</small>
+          </h4>
+          <hr class="form-border">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if current_user.is_role(Role.ADMIN) %}
+  {% block search %}
+  <div class="row">
+    <div class="col-lg-10">
+    <form method="POST" action="{{ url_for('main.search') }}">
+      {{ form.csrf_token }}
+          <div class="md-col-3 form-group">
+            {{ form.search(class="form-control",
+            placeholder="Search (Username, First Name, Last Name, Email, Location)...") }}
+          </div>
+          <div class="form-group">
+            {{ form.submit(class="btn btn-primary form-control") }}
+          </div>
+    </form>
+    </div>
+  </div>
+  {% endblock %}
+<div class="row">
+  <div class="col-lg-10">
+    <form method="GET" action="{{ url_for('admin.add_user') }}">
+            <input class="btn btn-primary" type="submit" style="margin-top:10px" name="submit" value="Add user">
+          </form>
+    {% if not search_flag %}
+      <div class="card card-outline-secondary my-4">
+        <div class="card-header">
+          All users
+        </div>
+        <div class="card-body">
+          {% if users %}
+          {% for user in users %}
+          <h4>
+            Username:
+            <a href="{{ url_for('account.show', username=user.username) }}">{{ user.username }}</a>
+            <small>
+              {% if user.is_role(Role.EMPLOYEE) %}
+              (employee)
+              {% endif %}
+              {% if user.is_admin() %}
+              (admin)
+              {% endif %}
+            </small>
+          </h4>
+          <h4>
+            Name:
+            <small>{{ user.first_name }}</small>
+            {% if user.last_name %}
+            <small>{{ user.last_name }}</small>
+            {% endif %}
+          </h4>
+          <h4>
+            Email:
+            <small>{{ user.email }}</small>
+          </h4>
+          <h4>
+            Phone:
+            <small>{{ user.phone }}</small>
+          </h4>
+          <h4>
+            Date of birth:
+            <small>{{ user.dob }}</small>
+          </h4>
+          <h4>
+            Location:
+          <small>{{ user.location }}</small>
+          </h4>
+          <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
+            <input class="btn btn-danger" type="submit" style="margin-top:10px" name="submit" value="Delete user"
+            onclick="return confirm('Are you sure that you want to permanently delete this user?')">
+          </form>
+          <hr class="form-border">
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    {% if search_flag %}
+      <div class="card card-outline-secondary my-4">
+        <div class="card-header">
+          Search results for {{ keyword }} - {{ count }} results found
+        </div>
+        <div class="card-body">
+          {% if users %}
+          {% for user in users %}
+          <h4>
+            Username:
+            <a href="{{ url_for('account.show', username=user.username) }}">{{ user["username"] }}</a>
+          </h4>
+          <h4>
+            Name:
+            <small>{{ user["first_name"] }}</small>
+            {% if user["last_name"] %}
+            <small>{{ user["last_name"] }}</small>
+            {% endif %}
+          </h4>
+          <h4>
+            Email:
+            <small>{{ user["email"] }}</small>
+          </h4>
+          <h4>
+            Phone:
+            <small>{{ user["phone"] }}</small>
+          </h4>
+          <h4>
+            Date of birth:
+            <small>{{ user["dob"] }}</small>
+          </h4>
+          <h4>
+            Location:
+          <small>{{ user["location"] }}</small>
+          </h4>
+          <form method="POST" action="{{ url_for('admin.delete_user', user_id=user['id']) }}">
+            <input class="btn btn-danger" type="submit" style="margin-top:10px" name="submit" value="Delete user"
+            onclick="return confirm('Are you sure that you want to permanently delete this user?')">
+          </form>
+          <hr class="form-border">
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}

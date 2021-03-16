@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% set active_page = 'home' %}
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+{% if current_user.is_authenticated() %}
+  {% include 'home/_authenticated.html' %}
+{% else %}
+  {% include 'home/_landing.html' %}
+{% endif %}
+
+{% endblock %}
