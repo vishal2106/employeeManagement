@@ -1,8 +1,9 @@
-from flask import Blueprint, session, g, request, current_app, make_response, render_template, flash, redirect, url_for
+from flask import Blueprint, session, g, has_request_context, request, current_app, make_response, \
+    render_template, flash, redirect, url_for
 from employeeManagement.auth.forms import RegistrationForm, LoginForm, UpdatePasswordForm, PasswordResetForm
 from employeeManagement import db
 from employeeManagement.models import User, Role
-from employeeManagement.emails import send_password_reset_mail
+from employeeManagement.auth.utils import send_reset_email
 from werkzeug.local import LocalProxy
 from itsdangerous.url_safe import URLSafeSerializer
 from functools import wraps
@@ -110,48 +111,40 @@ def logout():
     return resp
 
 
-@auth.route("/password_reset", methods=["GET", "POST"])
-def password_reset():
-    if current_user.is_authenticated():
-        return redirect(url_for("main.home"))
+@auth.route("/reset_password", methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_anonymous():
+        form = PasswordResetForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                send_reset_email(user)
+                flash('An email has been sent with instructions to reset your password.', 'info')
+                return redirect(url_for('auth.login'))
+            else:
+                flash("Account doesn't exist", 'danger')
+                return redirect(url_for('auth.login'))
+        return render_template('password_reset.html', form=form)
+    else:
+        return redirect(url_for('main.home'))
 
-    form = PasswordResetForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        user = User.query.filter_by(email=email).first()
-        user.create_token_for("reset")
-        db.session.commit()
-        send_password_reset_mail(user)
-        flash("The password reset instructions are sent to your email.", "success")
-        return redirect(url_for("main.home"))
 
-    return render_template("password_reset.html", form=form)
-
-
-@auth.route("/update_password/<token>/<email>", methods=["GET", "POST"])
-def update_password(token, email):
-    if current_user.is_authenticated():
-        return redirect(url_for("main.home"))
-
-    user = User.query.filter_by(email=email).first()
-    if not user or not user.check_reset_token(token):
-        flash("The password reset link is not valid or it has expired.", "danger")
-        return redirect(url_for("main.home"))
-
-    form = UpdatePasswordForm()
-    if form.validate_on_submit():
-        password = form.password.data
-
-        user.password = password
-        user.reset_hash = ""
-        db.session.add(user)
-        db.session.commit()
-
-        flash("New password is set! You can now login to the account.", "success")
-        return redirect(url_for("auth.login"))
-
-    flash("Hi " + user.username + "! You can now set a new password for the account.", "success")
-    return render_template("update_password.html", form=form, token=token, email=email)
+@auth.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_anonymous():
+        user = User.verify_reset_token(token)
+        if user is None:
+            flash('That is an invalid or expired token', 'warning')
+            return redirect(url_for('auth.reset_request'))
+        form = UpdatePasswordForm()
+        if form.validate_on_submit():
+            user.password = form.password.data
+            db.session.commit()
+            flash('Your password has been updated! You are now able to log in', 'success')
+            return redirect(url_for('auth.login'))
+        return render_template('update_password.html', title='Reset Password', form=form)
+    else:
+        return redirect(url_for('main.home'))
 
 
 def login_user(user):
@@ -164,7 +157,9 @@ def logout_user():
 
 @auth.app_context_processor
 def inject_current_user():
-    return dict(current_user=get_current_user())
+    if has_request_context():
+        return dict(current_user=get_current_user())
+    return dict(current_user="")
 
 
 @auth.app_context_processor

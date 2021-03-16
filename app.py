@@ -1,5 +1,5 @@
 import os
-from employeeManagement import create_app, db
+from employeeManagement import create_app, db, celery
 from employeeManagement.models import User
 from flask_migrate import Migrate
 

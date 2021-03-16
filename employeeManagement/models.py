@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask import current_app
 from employeeManagement import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from secrets import token_urlsafe
@@ -62,8 +64,6 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     remember_hashes = db.relationship("Remember", backref="user", lazy="dynamic", cascade="all, delete-orphan")
     role_id = db.Column(db.Integer())
-    reset_hash = db.Column(db.String(255))
-    reset_sent_at = db.Column(db.DateTime())
 
     def __init__(self, username="", first_name="", last_name="", phone=0, dob=datetime.now(), email="", password="",
                  location="", role_id=Role.ADMIN):
@@ -118,14 +118,15 @@ class User(db.Model):
     def is_role(self, role):
         return self.role_id == role
 
-    def create_token_for(self, token_type):
-        setattr(self, token_type + "_token", generate_token())
-        setattr(self, token_type + "_hash", generate_hash(getattr(self, token_type + "_token")))
-        setattr(self, token_type + "_sent_at", datetime.utcnow())
-        db.session.add(self)
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
 
-    def check_reset_token(self, token):
-        minutes_from_sending_reset = (datetime.utcnow() - self.reset_sent_at).total_seconds()/60
-        if _check_token(self.reset_hash, token) and minutes_from_sending_reset < 30:
-            return True
-        return False
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
