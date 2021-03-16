@@ -61,7 +61,9 @@ class User(db.Model):
     location = db.Column(db.String(255), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     remember_hashes = db.relationship("Remember", backref="user", lazy="dynamic", cascade="all, delete-orphan")
-    role_id = db.Column(db.Integer(), default=0)
+    role_id = db.Column(db.Integer())
+    reset_hash = db.Column(db.String(255))
+    reset_sent_at = db.Column(db.DateTime())
 
     def __init__(self, username="", first_name="", last_name="", phone=0, dob=datetime.now(), email="", password="",
                  location="", role_id=Role.ADMIN):
@@ -116,3 +118,14 @@ class User(db.Model):
     def is_role(self, role):
         return self.role_id == role
 
+    def create_token_for(self, token_type):
+        setattr(self, token_type + "_token", generate_token())
+        setattr(self, token_type + "_hash", generate_hash(getattr(self, token_type + "_token")))
+        setattr(self, token_type + "_sent_at", datetime.utcnow())
+        db.session.add(self)
+
+    def check_reset_token(self, token):
+        minutes_from_sending_reset = (datetime.utcnow() - self.reset_sent_at).total_seconds()/60
+        if _check_token(self.reset_hash, token) and minutes_from_sending_reset < 30:
+            return True
+        return False

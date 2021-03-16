@@ -28,8 +28,12 @@
       <div class="form-group">
         {{ form.submit(class="btn btn-primary form-control") }}
       </div>
-      <a href="#">Forgot password?</a>
-      <a href="{{ url_for('auth.register') }}">Not registered yet? Register here</a>
+      <div class="form-group">
+        <a href="{{ url_for('auth.password_reset') }}">Forgot password?</a>
+      </div>
+      <div class="form-group">
+        <a href="{{ url_for('auth.register') }}">Not registered yet? Register here</a>
+      </div>
     </form>
   </div>
 </div>

@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 from flask import Blueprint, render_template
@@ -28,7 +29,7 @@ def search():
     if form.validate_on_submit():
         keyword = form.search.data
         params = {'keyword': keyword}
-        users = requests.get('http://localhost:5001/api/search_admin', params=params)
+        users = requests.get('http://'+os.getenv('HOST')+'/api/search_admin', params=params)
         form.search.data = ""
         users = json.loads(users.text)
         return render_template('home.html', form=form, users=users, search_flag=True

@@ -2,9 +2,11 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 
 db = SQLAlchemy()
 jwt = JWTManager()
+mail = Mail()
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,12 +17,12 @@ def create_app():
         SECRET_KEY=os.getenv("FLASK_SECRET_KEY") or 'prc9FWjeLYh_KsPGm0vJcg',
         JWT_SECRET_KEY=os.getenv("JWT_SECRET_KEY") or 'WhyEncryptIT@0',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'employee.sqlite'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        DEBUG=True
+        SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
 
     db.init_app(app)
     jwt.init_app(app)
+    mail.init_app(app)
     with app.app_context():
         db.create_all()
 

@@ -86,3 +86,26 @@ class LoginForm(FlaskForm):
                                 ])
     remember_me = BooleanField("Remember me")
     submit = SubmitField("Login")
+
+
+class PasswordResetForm(FlaskForm):
+    email = EmailField("Your email", validators=[
+                                    InputRequired("Input is required!"),
+                                    DataRequired("Data is required!"),
+                                    user_exists_with_email
+                                ])
+    submit = SubmitField("Submit")
+
+
+class UpdatePasswordForm(FlaskForm):
+    password = PasswordField("New password", validators=[
+                                    InputRequired("Input is required!"),
+                                    DataRequired("Data is required!"),
+                                    Length(min=10, max=40, message="Password must be between 10 and 40 characters long"),
+                                    EqualTo("password_confirm", message="Passwords must match")
+                                ])
+    password_confirm = PasswordField("Confirm new password", validators=[
+                                    InputRequired("Input is required!"),
+                                    DataRequired("Data is required!")
+                                ])
+    submit = SubmitField("Update password")

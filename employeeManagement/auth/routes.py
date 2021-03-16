@@ -1,7 +1,8 @@
 from flask import Blueprint, session, g, request, current_app, make_response, render_template, flash, redirect, url_for
-from employeeManagement.auth.forms import RegistrationForm, LoginForm
+from employeeManagement.auth.forms import RegistrationForm, LoginForm, UpdatePasswordForm, PasswordResetForm
 from employeeManagement import db
 from employeeManagement.models import User, Role
+from employeeManagement.emails import send_password_reset_mail
 from werkzeug.local import LocalProxy
 from itsdangerous.url_safe import URLSafeSerializer
 from functools import wraps
@@ -77,7 +78,10 @@ def register():
             email = form.email.data
             password = form.password.data
             location = form.location.data
-            role = 1
+            if username == 'admin':
+                role = 1
+            else:
+                role = 2
 
             user = User(username, first_name, last_name, phone, dob, email, password, location, role)
             db.session.add(user)
@@ -104,6 +108,50 @@ def logout():
     logout_user()
     flash("You are logged out", "success")
     return resp
+
+
+@auth.route("/password_reset", methods=["GET", "POST"])
+def password_reset():
+    if current_user.is_authenticated():
+        return redirect(url_for("main.home"))
+
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = User.query.filter_by(email=email).first()
+        user.create_token_for("reset")
+        db.session.commit()
+        send_password_reset_mail(user)
+        flash("The password reset instructions are sent to your email.", "success")
+        return redirect(url_for("main.home"))
+
+    return render_template("password_reset.html", form=form)
+
+
+@auth.route("/update_password/<token>/<email>", methods=["GET", "POST"])
+def update_password(token, email):
+    if current_user.is_authenticated():
+        return redirect(url_for("main.home"))
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.check_reset_token(token):
+        flash("The password reset link is not valid or it has expired.", "danger")
+        return redirect(url_for("main.home"))
+
+    form = UpdatePasswordForm()
+    if form.validate_on_submit():
+        password = form.password.data
+
+        user.password = password
+        user.reset_hash = ""
+        db.session.add(user)
+        db.session.commit()
+
+        flash("New password is set! You can now login to the account.", "success")
+        return redirect(url_for("auth.login"))
+
+    flash("Hi " + user.username + "! You can now set a new password for the account.", "success")
+    return render_template("update_password.html", form=form, token=token, email=email)
 
 
 def login_user(user):
