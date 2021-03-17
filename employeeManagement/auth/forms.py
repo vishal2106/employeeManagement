@@ -27,7 +27,7 @@ class RegistrationForm(FlaskForm):
                                     InputRequired("Input is required!"),
                                     DataRequired("Data is required!")
                                     ])
-    dob = DateField("Date of birth*", format="%Y-%m-%d", validators=[
+    dob = DateField("Date of birth (YYYY-MM-DD) *", format="%Y-%m-%d", validators=[
                                     InputRequired("Input is required!"),
                                     DataRequired("Data is required!")
                                     ])
