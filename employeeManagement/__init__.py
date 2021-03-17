@@ -18,6 +18,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 def create_app():
     app = Flask(__name__)
     app.config.from_mapping(
+        DEBUG=True,
         SECRET_KEY=os.getenv("FLASK_SECRET_KEY") or 'prc9FWjeLYh_KsPGm0vJcg',
         JWT_SECRET_KEY=os.getenv("JWT_SECRET_KEY") or 'WhyEncryptIT@0',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'employee.sqlite'),
@@ -27,6 +28,7 @@ def create_app():
         MAIL_USE_TLS=True,
         MAIL_USERNAME=os.environ.get('EMAIL_USER'),
         MAIL_PASSWORD=os.environ.get('EMAIL_PASS'),
+        SEND_MAILS_WITH_CELERY=False,
         CELERY_BROKER_URL='redis://redis:6379/0',
         CELERY_RESULT_BACKEND='redis://redis:6379/0'
     )

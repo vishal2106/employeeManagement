@@ -2,7 +2,6 @@ import os
 import requests
 import json
 from flask import Blueprint, render_template
-
 from employeeManagement.auth.routes import current_user, role_required
 from employeeManagement.models import User, Role
 from employeeManagement.main.forms import SearchForm
