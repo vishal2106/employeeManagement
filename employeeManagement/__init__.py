@@ -18,7 +18,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 def create_app():
     app = Flask(__name__)
     app.config.from_mapping(
-        DEBUG=True,
         SECRET_KEY=os.getenv("FLASK_SECRET_KEY") or 'prc9FWjeLYh_KsPGm0vJcg',
         JWT_SECRET_KEY=os.getenv("JWT_SECRET_KEY") or 'WhyEncryptIT@0',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'employee.sqlite'),
