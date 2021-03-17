@@ -27,7 +27,7 @@ def create_app():
         MAIL_USE_TLS=True,
         MAIL_USERNAME=os.environ.get('EMAIL_USER'),
         MAIL_PASSWORD=os.environ.get('EMAIL_PASS'),
-        SEND_MAILS_WITH_CELERY=False,
+        SEND_MAILS_WITH_CELERY=True,
         CELERY_BROKER_URL='redis://redis:6379/0',
         CELERY_RESULT_BACKEND='redis://redis:6379/0'
     )
