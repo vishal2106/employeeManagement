@@ -2,7 +2,7 @@
 
 A employee management project to manage employees in a company/organization with master/admin view.
 
-# [Heroku link for live version](vishal-employee.herokuapp.com)
+# [Heroku link for live version](https://vishal-employee.herokuapp.com)
 
 ### Tech
 * [Flask] - Backend 
@@ -13,7 +13,7 @@ A employee management project to manage employees in a company/organization with
 * [SQLAlchemy] - SQL toolkit for python
 
 
-- ![Flask Logo](/images/flask.jpg) ![Heroku Logo](/images/heroku.png)
+- ![Flask Logo](/images/flask.png) ![Heroku Logo](/images/heroku.png)
 - ![Redis Logo](/images/redis.jpg) ![Celery Logo](/images/celery.png)
 - ![Docker Logo](/images/docker.jpg) ![SQLAlchemy](/images/sqla.png)
 
@@ -28,7 +28,7 @@ $ # also make sure less secure apps access is turned on in gmail
 $ docker-compose up
 $ # this will build and run 3 services-flask, redis, celery worker
 ```
-### Go to localhost:5000 or [vishal-employee.herokuapp.com](vishal-employee.herokuapp.com/) in your browser to try out the app
+### Go to localhost:5000 or [https://vishal-employee.herokuapp.com](https://vishal-employee.herokuapp.com/) in your browser to try out the app
 ### If on localhost, please first register as an admin (keep username as 'admin'), deployed version already has admin and users registerd (*credentials required)
 
 ### URL Endpoints
