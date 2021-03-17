@@ -15,7 +15,7 @@ A employee management project to manage employees in a company/organization with
 
 - ![Flask Logo](/images/flask.png) ![Heroku Logo](/images/heroku.png)
 - ![Redis Logo](/images/redis.jpg) ![Celery Logo](/images/celery.png)
-- ![Docker Logo](/images/docker.jpg) ![SQLAlchemy](/images/sqla.png)
+- ![Docker Logo](/images/docker.png) ![SQLAlchemy](/images/sqla.png)
 
 ### Try it out
 
